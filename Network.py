@@ -3,6 +3,8 @@ from copy import deepcopy
 from random import random
 import matplotlib.pyplot as plt
 
+from utils import get_coords, get_unique_keys, parse_dict
+
 
 class Network:
     history = []
@@ -16,20 +18,23 @@ class Network:
     improving_path = []
     dead_end_networks = []
     inspected_networks = []
-    rule = lambda x: x
 
     def __init__(self, param, symmetrize=False, improving_path=[], **args):
         self.current_plot = 0
         if isinstance(param, dict):
-            self.network = deepcopy(param)
+            keys = get_unique_keys(param)
+            self.network = parse_dict(param)
         elif isinstance(param, int):
+            keys = list(range(0, param))
             self.network = {i: [] for i in [*range(0, param)]}
-        elif isinstance(param, list):
-            self.decoder = lambda x: param[x]
         else:
             self.network = {}
         if symmetrize:
             self.symmetrize()
+        # decoder is used for output. inner indexes are always integer but
+        # since we may want to store actual string names for players
+        # we can decode indexes into strings (and back if we really want to)
+        self.decoder = lambda x: keys[x]
         self.improving_path = deepcopy(improving_path)
         self.rule = args.get('rule', lambda x: 0)
 
@@ -161,7 +166,7 @@ class Network:
         stable = True
         better_network_exists = False
 
-        if not self.network in Network.inspected_networks:
+        if self.network not in Network.inspected_networks:
             Network.inspected_networks.append(self.network)
         else:
             return []
