@@ -25,3 +25,14 @@ def parse_dict(param):
             list.append(keys.index(adjacent_node))
         temp_dict[keys.index(node)] = temp_list
     return temp_dict
+
+
+def memoize(f):
+    memo = {}
+
+    def helper(x):
+        if x not in memo:
+            memo[x] = f(x)
+        return memo[x]
+
+    return helper

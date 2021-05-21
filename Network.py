@@ -324,3 +324,8 @@ class Network:
         network_keys = self.network.keys()
         mixed_indexes = random.sample(network_keys, k=network_keys)
         return lambda index: mixed_indexes[index]
+
+
+class Configuration:
+    def __int__(self):
+        self.graph = dict()
