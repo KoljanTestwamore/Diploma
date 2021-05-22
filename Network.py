@@ -22,19 +22,20 @@ class Network:
     def __init__(self, param, symmetrize=False, improving_path=[], **args):
         self.current_plot = 0
         if isinstance(param, dict):
-            keys = get_unique_keys(param)
+            players = get_unique_keys(param)
             self.network = parse_dict(param)
         elif isinstance(param, int):
-            keys = list(range(0, param))
+            players = list(range(0, param))
             self.network = {i: [] for i in [*range(0, param)]}
         else:
             self.network = {}
         if symmetrize:
             self.symmetrize()
+        self.players_amount = len(players)
         # decoder is used for output. inner indexes are always integer but
         # since we may want to store actual string names for players
         # we can decode indexes into strings (and back if we really want to)
-        self.decoder = lambda x: keys[x]
+        self.decoder = lambda x: players[x]
         self.improving_path = deepcopy(improving_path)
         self.rule = args.get('rule', lambda x: 0)
 
@@ -215,7 +216,7 @@ class Network:
                     else:
                         continue
             checked.append(node1)
-        if (len(adjacent_improved) == 0) and not (stable):
+        if (len(adjacent_improved) == 0) and not stable:
             Network.dead_end_networks.append(self.network)
         if stable:
             Network.stable_networks.append(self.network)
@@ -327,5 +328,20 @@ class Network:
 
 
 class Configuration:
-    def __int__(self):
-        self.graph = dict()
+    def __int__(self, graph, parent_network):
+        self.network = parent_network
+        self.graph = graph
+
+    def __eq__(self, other):
+        return self.network == other.network and self.graph == other.graph
+
+    def value(self):
+        result = 0
+        for node in range(0, self.network.players_amount):
+            result = result + self.network.rule(node, self.graph)
+        return result
+
+    def xml(self, title=""):
+        # generates xml file. used for gephi
+        # TODO: implementation
+        return

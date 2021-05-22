@@ -33,6 +33,19 @@ def memoize(f):
     def helper(x):
         if x not in memo:
             memo[x] = f(x)
+        else:
+            print('memoized')
         return memo[x]
 
     return helper
+
+
+def relax(x):
+    return x
+
+
+if __name__ == "__main__":
+    mem = memoize(relax)
+    mem(1)
+    print(mem(1))
+    print(mem(1))
